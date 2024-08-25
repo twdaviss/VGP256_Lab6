@@ -21,32 +21,22 @@ public class BlockRampSystem : MonoBehaviour
 
     private Vector2 topRampPoint;
     private Vector2 botRampPoint;
-    private Vector2 cornerRampPoint;
-
     private float angle;
     private float xDiff;
     private float yDiff;
     private float slope;
     private float yInt;
-    private float rampLength;
     private float blockWidth;
     private float velocity = 0;
-
     private float frictionCoefficient;
-
     private Vector3 originalPosition;
-    private bool stopped = false;
+
     void Start()
     {
         originalPosition = blockCollider.transform.position;
     }
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) 
-        { 
-            blockCollider.transform.position = originalPosition; 
-            velocity = 0;
-        }
         topRampPoint = rampCollider.points[1] + (Vector2)rampCollider.transform.position;
         botRampPoint = rampCollider.points[2] + (Vector2)rampCollider.transform.position;
         blockWidth = blockCollider.gameObject.transform.localScale.x;
@@ -88,7 +78,6 @@ public class BlockRampSystem : MonoBehaviour
         float acceleration = totalForce/mass;
 
         velocity += acceleration * Time.deltaTime * 0.01f;
-        if (stopped) { velocity = 0f; }
         float xVelocity = velocity * Mathf.Sin(-angle);
         blockCollider.transform.position = new Vector3(blockCollider.transform.position.x + xVelocity, yPos + blockWidth / 2, 0);
         blockCollider.transform.SetPositionAndRotation(new Vector3(blockCollider.transform.position.x + xVelocity, yPos + blockWidth / 2, 0), Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * angle));
@@ -96,17 +85,7 @@ public class BlockRampSystem : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision != null)
-        {
-            stopped = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision != null)
-        {
-            stopped = false;
-        }
+        blockCollider.transform.position = originalPosition;
+         velocity = 0;
     }
 }
