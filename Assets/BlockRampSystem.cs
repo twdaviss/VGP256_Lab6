@@ -8,6 +8,7 @@ public enum SurfaceFriction
     WoodOnWood,
     WoodOnConcrete,
     WoodOnMetal,
+    WoodOnIce,
     MetalOnConcrete,
 };
 public class BlockRampSystem : MonoBehaviour
@@ -34,7 +35,7 @@ public class BlockRampSystem : MonoBehaviour
     private float frictionCoefficient;
 
     private Vector3 originalPosition;
-
+    private bool stopped = false;
     void Start()
     {
         originalPosition = blockCollider.transform.position;
@@ -72,6 +73,9 @@ public class BlockRampSystem : MonoBehaviour
             case SurfaceFriction.MetalOnConcrete:
                 frictionCoefficient = 0.6f;
                 break;
+            case SurfaceFriction.WoodOnIce:
+                frictionCoefficient = 0.05f;
+                break;
         }
 
         Vector2 fg = gravity * mass;
@@ -84,9 +88,25 @@ public class BlockRampSystem : MonoBehaviour
         float acceleration = totalForce/mass;
 
         velocity += acceleration * Time.deltaTime * 0.01f;
+        if (stopped) { velocity = 0f; }
         float xVelocity = velocity * Mathf.Sin(-angle);
         blockCollider.transform.position = new Vector3(blockCollider.transform.position.x + xVelocity, yPos + blockWidth / 2, 0);
         blockCollider.transform.SetPositionAndRotation(new Vector3(blockCollider.transform.position.x + xVelocity, yPos + blockWidth / 2, 0), Quaternion.Euler(0f, 0f, Mathf.Rad2Deg * angle));
+    }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision != null)
+        {
+            stopped = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision != null)
+        {
+            stopped = false;
+        }
     }
 }
